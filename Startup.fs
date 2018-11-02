@@ -8,19 +8,22 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open WebSharper.AspNetCore
+open Microsoft.AspNetCore.Mvc
 
 type Startup() =
-
     member this.ConfigureServices(services: IServiceCollection) =
-        services.AddSitelet(Site.Main)
+        services
+            .AddSitelet(Site.Main)
             .AddAuthentication("WebSharper")
             .AddCookie("WebSharper", fun options -> ())
+           
         |> ignore
 
     member this.Configure(app: IApplicationBuilder, env: IHostingEnvironment) =
         if env.IsDevelopment() then app.UseDeveloperExceptionPage() |> ignore
 
-        app.UseAuthentication()
+        app
+            .UseAuthentication()
             .UseStaticFiles()
             .UseWebSharper()
             .Run(fun context ->

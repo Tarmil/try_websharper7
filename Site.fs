@@ -4,6 +4,7 @@ open WebSharper
 open WebSharper.Sitelets
 open WebSharper.UI
 open WebSharper.UI.Server
+open WebSharper.JQuery
 
 type EndPoint =
     | [<EndPoint "/">] Home
@@ -11,14 +12,11 @@ type EndPoint =
 module Templating =
     open WebSharper.UI.Templating
 
-    type LayoutTemplate = Template<"Layout.html", ClientLoad.FromDocument>
-    type HomeTemplate = Template<"Home.html", ClientLoad.FromDocument>   
+    type HomeTemplate = Template<"Home.html", ClientLoad.FromDocument>
 
 [<JavaScript>]
 module Client = 
-    let FillRegion () = 
-        //get by local IP
-        let region = "Mars-1"
+    let private insertRegion (region : string) = 
         let content = 
             Templating
                 .HomeTemplate
@@ -31,25 +29,26 @@ module Client =
             .Region(content)
             .Bind()
 
+    let FillRegionAjax () = 
+        let geoUrl = "https://ipinfo.io/json"
+        
+        JQuery.GetJSON(geoUrl, fun (_, _) ->
+            //get by local IP
+            insertRegion "Mars-1"
+        )|> ignore
+
+    let FillRegionPlain () = 
+        insertRegion "Mars-1"
+
 module Site =
-    let LayoutPage ctx (title: string) (body: Doc) =
-        Content.Page(
-            Templating
-                .LayoutTemplate()
-                .Title(title)
-                .Body(body)
-                .Elt(keepUnfilled = true)
-                .OnAfterRender(fun _ -> Client.FillRegion ())
-        )
-
     let HomePage ctx =
-        let body = 
-            Templating
-                .HomeTemplate()
-                .Doc(keepUnfilled = true)
-
-        LayoutPage ctx "Home page" body
-
+        Content.Page(
+            Templating.HomeTemplate()
+                .Title("Home page")
+                .Elt(keepUnfilled = true)
+                .OnAfterRender(fun _ -> Client.FillRegionAjax ())
+        )            
+ 
     [<Website>]
     let Main =
         Application.MultiPage (fun ctx endpoint ->

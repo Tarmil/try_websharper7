@@ -1,4 +1,22 @@
-<h1>Home page</h1>
-<div ws-hole="Region" ws-children-template="RegionTemplate">
-    Your region is: <b>${Name}</b>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta ws-replace="meta" />
+    <link ws-replace="styles" />
+    <title>${Title}</title>
+</head>
+
+<body>
+    <h1>Home page</h1>
+    <div ws-hole="Region" ws-children-template="RegionTemplate">
+        <div>
+            Your region is: <b>${Name}</b>
+        </div>
+    </div>
+    <script ws-replace="scripts"></script>
+</body>
+
+</html>
