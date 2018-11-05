@@ -16,7 +16,9 @@ module Templating =
 
 [<JavaScript>]
 module Client = 
-    let private insertRegion (region : string) = 
+    open WebSharper.UI.Notation
+
+    let private insertRegion (region : View<string>) = 
         let content = 
             Templating
                 .HomeTemplate
@@ -31,14 +33,18 @@ module Client =
 
     let FillRegionAjax () = 
         let geoUrl = "https://ipinfo.io/json"
+
+        let region = Var.Create "Loading region..."
         
         JQuery.GetJSON(geoUrl, fun (_, _) ->
             //get by local IP
-            insertRegion "Mars-1"
+            region := "Mars-1"
         )|> ignore
 
+        insertRegion region.View
+
     let FillRegionPlain () = 
-        insertRegion "Mars-1"
+        insertRegion (View.Const "Mars-1")
 
 module Site =
     let HomePage ctx =
